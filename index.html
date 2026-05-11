@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Woyzeck-Prozessor</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Georg Büchner</p>
+        <h1>Woyzeck-Prozessor</h1>
+      </div>
+      <div class="toolbar" aria-label="Werkzeuge">
+        <button id="printBtn" class="icon-btn" type="button" title="Drucken">⎙</button>
+        <button id="exportBtn" class="icon-btn" type="button" title="Zusammenstellung exportieren">⇩</button>
+        <button id="resetBtn" class="icon-btn danger" type="button" title="Zurücksetzen">↺</button>
+      </div>
+    </header>
+
+    <main class="app-shell">
+      <section class="library" aria-labelledby="libraryTitle">
+        <div class="panel-head">
+          <div>
+            <h2 id="libraryTitle">Szenenkarten</h2>
+            <p>27 Karten als schulpraktische Montagegrundlage. Die Szenenfolge bleibt bei Woyzeck editionsabhängig, weil das Drama nur als Fragment in mehreren Handschriften überliefert ist.</p>
+          </div>
+          <span id="visibleCount" class="counter"></span>
+        </div>
+
+        <div class="source-note">
+          <strong>Textgrundlage:</strong>
+          <a href="https://buechnerportal.de/werke/woyzeck/" target="_blank" rel="noreferrer">Büchnerportal: Woyzeck. Die Handschriften</a>
+          <span>Die Karten ordnen das Material didaktisch; sie ersetzen keine editionskritische Szenenfolge.</span>
+        </div>
+
+        <section class="combiner" aria-labelledby="combinerTitle">
+          <div class="combiner-head">
+            <div>
+              <h2 id="combinerTitle">Kombinationsmodi</h2>
+              <p>Lege nichts, Anfang, Ende oder beliebig viele Positionen fest. Der Generator füllt die offenen Stellen mit den übrigen Szenen.</p>
+            </div>
+            <button id="generateBtn" class="primary-btn" type="button">Generieren</button>
+          </div>
+
+          <div class="mode-grid">
+            <label>
+              <span>Modus</span>
+              <select id="modeSelect">
+                <option value="random">a. Zufall</option>
+                <option value="first">b. Erste Szene festlegen</option>
+                <option value="last">c. Letzte Szene festlegen</option>
+                <option value="pinned">d. Mehrere Szenen festlegen</option>
+                <option value="puzzle">Totales Woyzeck-Puzzle</option>
+              </select>
+            </label>
+            <label>
+              <span>Erste Szene</span>
+              <select id="firstSceneSelect"></select>
+            </label>
+            <label>
+              <span>Letzte Szene</span>
+              <select id="lastSceneSelect"></select>
+            </label>
+          </div>
+
+          <details id="pinDetails" class="pin-details">
+            <summary>Positionen festlegen</summary>
+            <div class="pin-actions">
+              <button id="clearPinsBtn" type="button">Fixierungen löschen</button>
+              <button id="canonicalPinsBtn" type="button">Puzzle mit Standardfolge füllen</button>
+            </div>
+            <div id="pinGrid" class="pin-grid" aria-label="Szenenpositionen festlegen"></div>
+          </details>
+        </section>
+
+        <div class="controls" aria-label="Filter">
+          <label class="search">
+            <span>Suchen</span>
+            <input id="searchInput" type="search" placeholder="Figur, Motiv, Ort ...">
+          </label>
+          <label>
+            <span>Motiv</span>
+            <select id="motifFilter">
+              <option value="all">Alle Motive</option>
+            </select>
+          </label>
+          <label>
+            <span>Figur</span>
+            <select id="figureFilter">
+              <option value="all">Alle Figuren</option>
+            </select>
+          </label>
+        </div>
+
+        <div id="cardGrid" class="card-grid" aria-live="polite"></div>
+      </section>
+
+      <aside class="processor" aria-labelledby="processorTitle">
+        <div class="processor-head">
+          <div>
+            <h2 id="processorTitle">Meine Fassung</h2>
+            <p>Ziehe Karten hierhin oder nutze „Hinzufügen“. Danach kannst du die Reihenfolge verschieben.</p>
+          </div>
+          <span id="buildCount" class="counter">0 Szenen</span>
+        </div>
+
+        <div class="build-actions">
+          <button id="canonicalBtn" type="button">Standardfolge laden</button>
+          <button id="clearBuildBtn" type="button">Leeren</button>
+        </div>
+
+        <ol id="buildList" class="build-list" aria-label="Eigene Szenenfolge"></ol>
+
+        <section class="reading-output" aria-labelledby="readingTitle">
+          <div class="reading-head">
+            <h2 id="readingTitle">Auswertung</h2>
+            <button id="refreshReadingBtn" type="button">Neu deuten</button>
+          </div>
+          <div>
+            <h3>Handlung</h3>
+            <p id="plotOutput">Generiere oder baue eine Reihenfolge, dann entsteht hier eine Zusammenfassung.</p>
+          </div>
+          <div>
+            <h3>Woyzeck und Marie</h3>
+            <p id="interpretationOutput">Die Interpretation reagiert auf Anfang, Ende, Mordposition und Motivfolge.</p>
+          </div>
+          <div>
+            <h3>Morderklärung</h3>
+            <p id="murderOutput">Sobald Szene 20 enthalten ist, wird erklärt, wie die Montage den Mord lesbar macht.</p>
+          </div>
+        </section>
+
+        <label class="notes">
+          <span>Regieidee / Begründung</span>
+          <textarea id="notesInput" rows="7" placeholder="Warum diese Ordnung? Welche Motive werden stärker?"></textarea>
+        </label>
+      </aside>
+    </main>
+
+    <template id="sceneCardTemplate">
+      <article class="scene-card" draggable="true">
+        <div class="scene-topline">
+          <span class="scene-number"></span>
+          <span class="scene-phase"></span>
+        </div>
+        <h3></h3>
+        <p class="scene-place"></p>
+        <p class="scene-summary"></p>
+        <dl>
+          <div>
+            <dt>Figuren</dt>
+            <dd class="scene-figures"></dd>
+          </div>
+          <div>
+            <dt>Funktion</dt>
+            <dd class="scene-function"></dd>
+          </div>
+          <div>
+            <dt>Bühnenwert</dt>
+            <dd class="scene-stage"></dd>
+          </div>
+        </dl>
+        <div class="chips"></div>
+        <button class="add-btn" type="button">Hinzufügen</button>
+      </article>
+    </template>
+
+    <script src="app.js"></script>
+  </body>
+</html>
