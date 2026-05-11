@@ -338,7 +338,7 @@ h2 {
 
 .speech-controls {
   display: grid;
-  grid-template-columns: repeat(3, auto) minmax(180px, 1fr);
+  grid-template-columns: repeat(4, auto) minmax(180px, 1fr);
   align-items: center;
   gap: 8px;
   margin-top: 12px;
@@ -387,6 +387,32 @@ h2 {
 
 .interview-output strong {
   color: var(--accent-2);
+}
+
+.dialogue-turn {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.dialogue-turn:last-child {
+  margin-bottom: 0;
+}
+
+.dialogue-question,
+.dialogue-answer {
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.dialogue-question {
+  justify-self: start;
+  background: rgba(255, 253, 248, 0.24);
+  color: rgba(31, 35, 38, 0.82);
+}
+
+.dialogue-answer {
+  background: rgba(36, 107, 105, 0.1);
 }
 
 .pin-details {

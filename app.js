@@ -333,12 +333,15 @@ const interviewOutput = document.querySelector("#interviewOutput");
 const listenBtn = document.querySelector("#listenBtn");
 const speakAnswerBtn = document.querySelector("#speakAnswerBtn");
 const stopSpeechBtn = document.querySelector("#stopSpeechBtn");
+const resetConversationBtn = document.querySelector("#resetConversationBtn");
 const speechStatus = document.querySelector("#speechStatus");
 
 let build = JSON.parse(localStorage.getItem("woyzeckBuild") || "[]");
 notesInput.value = localStorage.getItem("woyzeckNotes") || "";
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = null;
+let lastSpokenAnswer = "";
+const conversationMemory = {};
 
 const interviewCharacters = [
   "Franz Woyzeck",
@@ -922,6 +925,10 @@ function characterSceneMatch(scene, character) {
 
 function inferQuestionKey(questionText) {
   const text = questionText.toLowerCase();
+  const memory = conversationMemory[characterSelect.value] || [];
+  const lastTurn = memory[memory.length - 1];
+  const isShortFollowUp = text.length < 32 && /^(warum|wieso|wie|und|aber|was meinst|erklär|erzaehl|erzähl|genauer|wirklich)/.test(text);
+  if (isShortFollowUp && lastTurn?.topic) return lastTurn.topic;
   if (text.includes("woyzeck") || text.includes("franz")) return "woyzeck";
   if (text.includes("marie")) return "marie";
   if (text.includes("tambour")) return "tambourmajor";
@@ -971,31 +978,163 @@ function escapeHtml(text) {
   })[char]);
 }
 
+function currentQuestionText(customQuestion, questionKey) {
+  if (customQuestion) return customQuestion;
+  const selected = questionSelect.options[questionSelect.selectedIndex];
+  return selected?.textContent || fallbackVoice(characterSelect.value, questionKey);
+}
+
+function buildHumanContext(character, sequence, questionKey) {
+  const witnessed = sequence.filter((scene) => characterSceneMatch(scene, character));
+  const lastWitnessed = witnessed[witnessed.length - 1];
+  const murderIndex = sequence.findIndex((scene) => scene.id === 20);
+  const murderKnown = murderIndex !== -1;
+  const pressure = motifLine(sequence);
+  const sceneContext = lastWitnessed
+    ? `Ich komme gerade von ${formatSceneRef(lastWitnessed)} her; das hängt mir nach: ${lastWitnessed.summary}`
+    : "Ich stehe in dieser Fassung eher am Rand. Ich höre, was passiert, und merke, wie die Leute darüber reden.";
+  const murderContext = murderKnown
+    ? `Und ja, der Mord liegt schon in dieser Geschichte, an Stelle ${murderIndex + 1}. Danach klingt jedes Wort anders.`
+    : "Vom Mord kann ich hier noch nicht als Gewissheit reden. Er liegt wie etwas in der Luft, aber er ist noch nicht geschehen.";
+  const themeContext = questionKey === "stand"
+    ? `Im Moment ziehen vor allem diese Kräfte durch die Handlung: ${pressure}.`
+    : "";
+  return { sceneContext, murderContext, themeContext };
+}
+
+function followUpRefinement(character, topic) {
+  const specific = {
+    Marie: {
+      love: "Weil Liebe bei mir nie allein Liebe sein darf. Sobald ich etwas will, stehen Kind, Armut, Nachbarinnen und Woyzecks Blick mit im Zimmer. Das macht Zärtlichkeit nicht falsch, aber es macht sie gefährlich.",
+      jealousy: "Weil seine Eifersucht mich nicht fragt, wie es mir geht. Sie sucht Zeichen. Und wenn einer nur noch Zeichen sucht, wird sogar mein Schweigen verdächtig.",
+      power: "Weil die anderen über meinen Körper reden, als sei er ein Beweisstück. Ich kann mich behaupten, ja, aber nie ohne dass gleich jemand urteilt.",
+      guilt: "Weil ich Schuld spüre und trotzdem leben will. Das passt nicht sauber zusammen, und vielleicht ist genau das mein Unglück."
+    },
+    "Franz Woyzeck": {
+      love: "Weil ich Liebe nicht halten kann wie etwas Ruhiges. Ich will Marie schützen und fürchte zugleich, sie zu verlieren. In mir wird Sorge schnell zu Angst.",
+      jealousy: "Weil ich nicht nur Marie sehe, sondern alles, was zwischen uns steht: Uniform, Geld, Spott, Gerede. Dann wird der Kopf eng.",
+      power: "Weil jeder etwas mit mir machen darf. Der Hauptmann redet, der Doktor misst, das Militär befiehlt. Irgendwann bleibt mir nur noch ein falscher, schrecklicher Akt von Macht.",
+      murder: "Weil der Mord nicht aus einem klaren Entschluss allein kommt. Da sind Stimmen, Beschämung, Armut, Eifersucht. Es sammelt sich, bis nichts mehr offen scheint."
+    },
+    Andres: {
+      fear: "Weil ich merke, dass mit Woyzeck etwas nicht stimmt, aber ich finde keine Sprache dafür. Ich bleibe beim Gewöhnlichen, vielleicht weil das einfacher ist.",
+      relations: "Weil Nähe nicht heißt, dass man versteht. Ich bin bei ihm, aber nicht wirklich in seinem Kopf."
+    },
+    Doktor: {
+      power: "Weil ich benenne, was andere nur erleiden. Das klingt nach Wissen, ist aber auch Herrschaft.",
+      guilt: "Weil ich zu spät merke, dass ein Fall noch kein Mensch ist. Oder ich merke es und übergehe es."
+    },
+    Hauptmann: {
+      guilt: "Weil mein Spott klein aussieht, aber er trifft einen, der sich kaum wehren kann. Moral kann auch eine bequeme Waffe sein.",
+      power: "Weil ich Zeit habe, über Tugend zu reden, während Woyzeck keine Zeit hat, überhaupt zu leben."
+    }
+  };
+  const general = {
+    relations: "Weil Beziehungen hier nie neutral sind. Jeder Blick ordnet jemanden ein: oben, unten, begehrenswert, lächerlich, schuldig.",
+    poverty: "Weil Armut nicht nur fehlt, sondern dauernd entscheidet. Sie entscheidet über Essen, Arbeit, Würde und darüber, wer sprechen darf.",
+    body: "Weil der Körper in diesem Stück selten einfach einem selbst gehört. Er wird benutzt, begehrt, gemessen, beschämt.",
+    society: "Weil die Gesellschaft nicht bloß zusieht. Sie spricht mit, lacht mit, urteilt mit, und oft merkt sie gar nicht, dass sie Gewalt vorbereitet.",
+    stand: "Weil die Reihenfolge, die du gebaut hast, die Figuren anders atmen lässt. Was früh kommt, wirkt wie Ursache; was spät kommt, wie Folge oder Nachhall."
+  };
+  return specific[character]?.[topic] || general[topic] || "Weil diese Fassung die Dinge nicht einfach erklärt, sondern sie aneinander reibt. Ich antworte aus dem, was bisher sichtbar geworden ist.";
+}
+
+function softenAnswer(character, questionKey, base, questionText, sequence) {
+  const memory = conversationMemory[character] || [];
+  const previous = memory[memory.length - 1];
+  const isBriefFollowUp = previous && questionText.length < 36;
+  const { sceneContext, murderContext, themeContext } = buildHumanContext(character, sequence, questionKey);
+  const starters = {
+    "Franz Woyzeck": ["Ja... hör, das ist nicht so einfach.", "Still. Ich muss erst atmen.", "Du fragst, als könnte ich das ordentlich sagen."],
+    Marie: ["Ach, wenn ich das klar sagen könnte.", "Das ist eine Frage, die mir nah geht.", "Ich merke, wie du nachhakst."],
+    Tambourmajor: ["Ha. Du willst es genauer wissen?", "Ich sage es direkt.", "Das dreht sich doch alles um Kraft."],
+    Doktor: ["Interessant. Sehr interessant sogar.", "Wenn Sie so fragen, muss man den Fall genauer fassen.", "Nun, die Beobachtung verschiebt sich."],
+    Hauptmann: ["Langsam, langsam. Solche Fragen machen Unruhe.", "Da muss man moralisch genau sein.", "Sie bringen mich in Verlegenheit."],
+    Andres: ["Ich weiß nicht, ob ich das richtig verstehe.", "Wenn du so fragst...", "Ich habe es eher gespürt als begriffen."],
+    Margreth: ["Nun, man sieht ja einiges, wenn man hinschaut.", "Das sagt man vielleicht nicht gern laut.", "Ich rede nicht aus der Luft."],
+    Narr: ["Ei, die Frage hat Zähne.", "Frag nur, frag nur.", "Die Wahrheit läuft schief, aber sie läuft."],
+    Jude: ["Ich rede vorsichtig.", "Die Leute hören bei mir schnell das Falsche.", "Ein Handel ist manchmal mehr als ein Handel."],
+    Wirt: ["Bei mir hört man vieles zwischen Musik und Lärm.", "Im Wirtshaus wird wenig sauber ausgesprochen.", "Ich sehe, was Leute zeigen, wenn sie sich unbeobachtet fühlen."]
+  };
+  const starterList = starters[character] || ["Ja, dazu kann ich etwas sagen."];
+  const starter = previous
+    ? `Wenn du daran anschließt: ${starterList[memory.length % starterList.length]}`
+    : starterList[0];
+  const bridge = previous
+    ? `Vorhin ging es um ${previous.topicLabel}; davon komme ich nicht ganz weg.`
+    : "";
+  const questionEcho = questionText.length < 45 && !isBriefFollowUp ? `Auf "${questionText}" würde ich nicht mit einer Definition antworten.` : "";
+  const answerCore = isBriefFollowUp ? followUpRefinement(character, previous.topic) : base;
+  return [starter, bridge, questionEcho, answerCore, sceneContext, murderContext, themeContext]
+    .filter(Boolean)
+    .join(" ");
+}
+
+function topicLabel(questionKey) {
+  const labels = {
+    relations: "die Beziehungen",
+    woyzeck: "Woyzeck",
+    marie: "Marie",
+    tambourmajor: "den Tambourmajor",
+    doctorCaptain: "Doktor und Hauptmann",
+    living: "die Lebensumstände",
+    poverty: "Armut und Arbeit",
+    love: "Liebe",
+    jealousy: "Eifersucht",
+    power: "Macht",
+    guilt: "Schuld",
+    body: "den Körper",
+    society: "die Gesellschaft",
+    fear: "Angst",
+    want: "den Wunsch",
+    murder: "die Gewalt",
+    stand: "den bisherigen Verlauf"
+  };
+  return labels[questionKey] || "deine Frage";
+}
+
+function renderConversation(character) {
+  const turns = conversationMemory[character] || [];
+  if (!turns.length) {
+    interviewOutput.textContent = "Wähle eine Figur und starte ein Gespräch.";
+    return;
+  }
+  interviewOutput.innerHTML = turns.map((turn) => `
+    <div class="dialogue-turn">
+      <div class="dialogue-question"><strong>Du:</strong> ${escapeHtml(turn.question)}</div>
+      <div class="dialogue-answer"><strong>${escapeHtml(character)}:</strong> ${escapeHtml(turn.answer)}</div>
+    </div>
+  `).join("");
+}
+
 function buildInterview() {
   const character = characterSelect.value;
   const customQuestion = customQuestionInput.value.trim();
   const question = customQuestion ? inferQuestionKey(customQuestion) : questionSelect.value;
   const sequence = build.map(sceneById).filter(Boolean);
   const voice = characterVoices[character][question] || fallbackVoice(character, question);
+  const questionText = currentQuestionText(customQuestion, question);
   if (!sequence.length) {
-    interviewOutput.textContent = `${character}: Ich kann noch nichts aus dieser Fassung wissen. Es ist noch keine Szene gesetzt.`;
+    const answer = "Noch ist da keine Szene, auf die ich mich wirklich stellen kann. Frag mich gleich noch einmal, sobald du eine Fassung begonnen hast.";
+    conversationMemory[character] = [...(conversationMemory[character] || []), {
+      question: questionText,
+      answer,
+      topic: question,
+      topicLabel: topicLabel(question)
+    }].slice(-6);
+    lastSpokenAnswer = `${character}: ${answer}`;
+    renderConversation(character);
     return;
   }
-
-  const witnessed = sequence.filter((scene) => characterSceneMatch(scene, character));
-  const lastWitnessed = witnessed[witnessed.length - 1];
-  const murderPos = sequence.findIndex((scene) => scene.id === 20) + 1 || null;
-  const murderKnown = murderPos !== null;
-  const motifs = motifLine(sequence);
-  const knowledge = lastWitnessed
-    ? `Mein letzter direkter Stand ist ${formatSceneRef(lastWitnessed)}: ${lastWitnessed.summary}`
-    : "Ich bin in dieser Fassung bisher nicht direkt aufgetreten; ich spreche also aus Randwissen, Gerücht und meiner sozialen Rolle.";
-  const limit = murderKnown
-    ? `Der Mord ist in dieser Montage bereits an Position ${murderPos} gesetzt; alles, was ich sage, steht unter diesem Wissen.`
-    : "Der Mord ist in dieser Montage noch nicht gesetzt; ich kann ihn nur als Möglichkeit, Drohung oder blinden Fleck berühren.";
-  const asked = customQuestion ? `Auf deine Frage „${escapeHtml(customQuestion)}“ antworte ich so: ` : "";
-
-  interviewOutput.innerHTML = `<strong>${character}:</strong> ${asked}${voice} ${knowledge} ${limit} Die bisherige Handlung wird von ${motifs} bestimmt.`;
+  const answer = softenAnswer(character, question, voice, questionText, sequence);
+  conversationMemory[character] = [...(conversationMemory[character] || []), {
+    question: questionText,
+    answer,
+    topic: question,
+    topicLabel: topicLabel(question)
+  }].slice(-6);
+  lastSpokenAnswer = `${character}: ${answer}`;
+  renderConversation(character);
   speakInterviewAnswer();
 }
 
@@ -1068,7 +1207,7 @@ function speakInterviewAnswer() {
     setSpeechStatus("Sprachausgabe wird in diesem Browser nicht unterstützt.");
     return;
   }
-  const text = interviewOutput.textContent.trim();
+  const text = lastSpokenAnswer || interviewOutput.textContent.trim();
   if (!text || text === "Wähle eine Figur und starte ein Gespräch.") {
     setSpeechStatus("Es gibt noch keine Antwort zum Vorlesen.");
     return;
@@ -1090,6 +1229,14 @@ function stopSpeech() {
   window.speechSynthesis?.cancel();
   listenBtn.classList.remove("listening");
   setSpeechStatus("Gestoppt.");
+}
+
+function resetConversation() {
+  conversationMemory[characterSelect.value] = [];
+  lastSpokenAnswer = "";
+  customQuestionInput.value = "";
+  renderConversation(characterSelect.value);
+  setSpeechStatus("Gespräch neu begonnen.");
 }
 
 function exportBuild() {
@@ -1173,6 +1320,10 @@ document.querySelector("#resetBtn").addEventListener("click", () => {
   characterSelect.value = "Franz Woyzeck";
   questionSelect.value = "stand";
   customQuestionInput.value = "";
+  Object.keys(conversationMemory).forEach((character) => {
+    conversationMemory[character] = [];
+  });
+  lastSpokenAnswer = "";
   interviewOutput.textContent = "Wähle eine Figur und starte ein Gespräch.";
   stopSpeech();
   clearPins();
@@ -1208,6 +1359,7 @@ document.querySelector("#interviewBtn").addEventListener("click", buildInterview
 listenBtn.addEventListener("click", startListening);
 speakAnswerBtn.addEventListener("click", speakInterviewAnswer);
 stopSpeechBtn.addEventListener("click", stopSpeech);
+resetConversationBtn.addEventListener("click", resetConversation);
 document.querySelector("#canonicalPinsBtn").addEventListener("click", () => {
   clearPins();
   scenes.forEach((scene, index) => setPin(index, scene.id));
@@ -1221,7 +1373,7 @@ modeSelect.addEventListener("change", () => {
 });
 
 stepDirectionSelect.addEventListener("change", renderStepState);
-characterSelect.addEventListener("change", buildInterview);
+characterSelect.addEventListener("change", () => renderConversation(characterSelect.value));
 questionSelect.addEventListener("change", buildInterview);
 customQuestionInput.addEventListener("keydown", (event) => {
   if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
