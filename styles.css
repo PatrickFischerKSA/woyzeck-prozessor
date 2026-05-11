@@ -279,6 +279,31 @@ h2 {
   line-height: 1.45;
 }
 
+.speech-controls {
+  display: grid;
+  grid-template-columns: repeat(3, auto) minmax(180px, 1fr);
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.speech-controls button {
+  min-height: 44px;
+  font-weight: 800;
+}
+
+.speech-controls button.listening {
+  border-color: rgba(156, 47, 54, 0.72);
+  background: rgba(156, 47, 54, 0.18);
+  color: var(--accent);
+}
+
+.speech-controls span {
+  color: rgba(31, 35, 38, 0.78);
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
 .step-status,
 .interview-output {
   margin-top: 12px;
@@ -673,7 +698,8 @@ dd {
   }
 
   .step-picker,
-  .interview-grid {
+  .interview-grid,
+  .speech-controls {
     grid-template-columns: 1fr;
   }
 

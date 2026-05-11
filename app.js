@@ -326,9 +326,15 @@ const characterSelect = document.querySelector("#characterSelect");
 const questionSelect = document.querySelector("#questionSelect");
 const customQuestionInput = document.querySelector("#customQuestionInput");
 const interviewOutput = document.querySelector("#interviewOutput");
+const listenBtn = document.querySelector("#listenBtn");
+const speakAnswerBtn = document.querySelector("#speakAnswerBtn");
+const stopSpeechBtn = document.querySelector("#stopSpeechBtn");
+const speechStatus = document.querySelector("#speechStatus");
 
 let build = JSON.parse(localStorage.getItem("woyzeckBuild") || "[]");
 notesInput.value = localStorage.getItem("woyzeckNotes") || "";
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
 
 const interviewCharacters = [
   "Franz Woyzeck",
@@ -978,6 +984,100 @@ function buildInterview() {
   const asked = customQuestion ? `Auf deine Frage „${escapeHtml(customQuestion)}“ antworte ich so: ` : "";
 
   interviewOutput.innerHTML = `<strong>${character}:</strong> ${asked}${voice} ${knowledge} ${limit} Die bisherige Handlung wird von ${motifs} bestimmt.`;
+  speakInterviewAnswer();
+}
+
+function setSpeechStatus(message) {
+  speechStatus.textContent = message;
+}
+
+function setupSpeechRecognition() {
+  if (!SpeechRecognition) {
+    listenBtn.disabled = true;
+    setSpeechStatus("Spracheingabe wird in diesem Browser nicht unterstützt.");
+    return;
+  }
+  recognition = new SpeechRecognition();
+  recognition.lang = "de-CH";
+  recognition.interimResults = true;
+  recognition.continuous = false;
+
+  recognition.addEventListener("start", () => {
+    listenBtn.classList.add("listening");
+    setSpeechStatus("Ich höre zu ...");
+  });
+  recognition.addEventListener("result", (event) => {
+    const transcript = Array.from(event.results)
+      .map((result) => result[0].transcript)
+      .join(" ")
+      .trim();
+    customQuestionInput.value = transcript;
+    if (event.results[event.results.length - 1].isFinal) {
+      setSpeechStatus("Frage erkannt. Antwort wird erzeugt.");
+      buildInterview();
+    }
+  });
+  recognition.addEventListener("end", () => {
+    listenBtn.classList.remove("listening");
+    if (!customQuestionInput.value.trim()) {
+      setSpeechStatus("Keine Frage erkannt. Bitte erneut sprechen oder tippen.");
+    }
+  });
+  recognition.addEventListener("error", (event) => {
+    listenBtn.classList.remove("listening");
+    setSpeechStatus(`Spracheingabe nicht möglich: ${event.error}.`);
+  });
+}
+
+function startListening() {
+  if (!recognition) {
+    setSpeechStatus("Spracheingabe wird in diesem Browser nicht unterstützt.");
+    return;
+  }
+  window.speechSynthesis?.cancel();
+  try {
+    recognition.start();
+  } catch {
+    recognition.stop();
+    setSpeechStatus("Spracheingabe läuft bereits.");
+  }
+}
+
+function pickGermanVoice() {
+  const voices = window.speechSynthesis?.getVoices?.() || [];
+  return voices.find((voice) => voice.lang === "de-CH")
+    || voices.find((voice) => voice.lang === "de-DE")
+    || voices.find((voice) => voice.lang.startsWith("de"))
+    || null;
+}
+
+function speakInterviewAnswer() {
+  if (!("speechSynthesis" in window)) {
+    setSpeechStatus("Sprachausgabe wird in diesem Browser nicht unterstützt.");
+    return;
+  }
+  const text = interviewOutput.textContent.trim();
+  if (!text || text === "Wähle eine Figur und starte ein Gespräch.") {
+    setSpeechStatus("Es gibt noch keine Antwort zum Vorlesen.");
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "de-CH";
+  utterance.voice = pickGermanVoice();
+  utterance.rate = 0.95;
+  utterance.pitch = characterSelect.value === "Marie" ? 1.08 : 0.92;
+  utterance.addEventListener("start", () => setSpeechStatus("Antwort wird vorgelesen."));
+  utterance.addEventListener("end", () => setSpeechStatus("Bereit für die nächste Frage."));
+  utterance.addEventListener("error", () => setSpeechStatus("Vorlesen wurde unterbrochen oder ist nicht verfügbar."));
+  window.speechSynthesis.speak(utterance);
+}
+
+function stopSpeech() {
+  recognition?.abort?.();
+  window.speechSynthesis?.cancel();
+  listenBtn.classList.remove("listening");
+  setSpeechStatus("Gestoppt.");
 }
 
 function exportBuild() {
@@ -1062,6 +1162,7 @@ document.querySelector("#resetBtn").addEventListener("click", () => {
   questionSelect.value = "stand";
   customQuestionInput.value = "";
   interviewOutput.textContent = "Wähle eine Figur und starte ein Gespräch.";
+  stopSpeech();
   clearPins();
   build = [];
   notesInput.value = "";
@@ -1080,6 +1181,9 @@ document.querySelector("#startStepBtn").addEventListener("click", startStepGame)
 document.querySelector("#chooseStepBtn").addEventListener("click", () => chooseStep());
 document.querySelector("#randomStepBtn").addEventListener("click", chooseRandomStep);
 document.querySelector("#interviewBtn").addEventListener("click", buildInterview);
+listenBtn.addEventListener("click", startListening);
+speakAnswerBtn.addEventListener("click", speakInterviewAnswer);
+stopSpeechBtn.addEventListener("click", stopSpeech);
 document.querySelector("#canonicalPinsBtn").addEventListener("click", () => {
   clearPins();
   scenes.forEach((scene, index) => setPin(index, scene.id));
@@ -1105,5 +1209,6 @@ populateFilters();
 populateCombiner();
 populateStepGame();
 populateInterviews();
+setupSpeechRecognition();
 renderCards();
 renderBuild();

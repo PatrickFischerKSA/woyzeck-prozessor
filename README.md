@@ -42,3 +42,4 @@ Nach jeder generierten oder manuell gebauten Reihenfolge erstellt die App automa
 
 Zusätzlich können Figureninterviews geführt werden. Die Antworten von Franz Woyzeck, Marie, Tambourmajor, Doktor, Hauptmann, Andres, Margreth, Narr, Jude und Wirt beziehen sich jeweils nur auf den aktuell entwickelten Stand der Dramenhandlung.
 Neben festen Fragevarianten gibt es ein Freifrage-Feld; die App erkennt daraus grob Themen wie Liebe, Eifersucht, Macht, Armut, Körper, Schuld oder Beziehungen.
+Im Browser kann per Sprachsteuerung gesprochen werden: Die Web Speech API transkribiert die Frage in das Freifrage-Feld, und die Speech Synthesis API liest die Antwort vor. Browser ohne diese APIs zeigen einen Hinweis im Statusfeld.
