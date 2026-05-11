@@ -223,10 +223,30 @@ h2 {
 .step-picker,
 .interview-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(220px, 0.65fr) minmax(360px, 1.35fr);
   align-items: end;
   gap: 10px;
   margin-top: 12px;
+}
+
+.interviews {
+  padding: 18px;
+}
+
+.interviews select {
+  min-height: 50px;
+  font-size: 1rem;
+}
+
+.custom-question {
+  display: block;
+  margin-top: 12px;
+}
+
+.custom-question textarea {
+  min-height: 84px;
+  font-size: 1rem;
+  line-height: 1.45;
 }
 
 .step-status,
@@ -234,8 +254,9 @@ h2 {
   margin-top: 12px;
   border: 1px solid rgba(184, 138, 43, 0.24);
   border-radius: 8px;
-  padding: 12px;
+  padding: 14px;
   background: rgba(255, 250, 241, 0.78);
+  min-height: 150px;
 }
 
 .step-status h3 {

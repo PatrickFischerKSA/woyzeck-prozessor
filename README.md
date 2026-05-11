@@ -41,3 +41,4 @@ Nach jeder generierten oder manuell gebauten Reihenfolge erstellt die App automa
 - eine Erklärung des Mords abhängig von Position, Vorzeichen und Nachspiel der Montage.
 
 Zusätzlich können Figureninterviews geführt werden. Die Antworten von Franz Woyzeck, Marie, Tambourmajor, Doktor, Hauptmann, Andres, Margreth, Narr, Jude und Wirt beziehen sich jeweils nur auf den aktuell entwickelten Stand der Dramenhandlung.
+Neben festen Fragevarianten gibt es ein Freifrage-Feld; die App erkennt daraus grob Themen wie Liebe, Eifersucht, Macht, Armut, Körper, Schuld oder Beziehungen.

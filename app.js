@@ -324,6 +324,7 @@ const stepProgress = document.querySelector("#stepProgress");
 const stepStoryOutput = document.querySelector("#stepStoryOutput");
 const characterSelect = document.querySelector("#characterSelect");
 const questionSelect = document.querySelector("#questionSelect");
+const customQuestionInput = document.querySelector("#customQuestionInput");
 const interviewOutput = document.querySelector("#interviewOutput");
 
 let build = JSON.parse(localStorage.getItem("woyzeckBuild") || "[]");
@@ -360,31 +361,96 @@ const characterVoices = {
     stand: "Ich bin durch die Szenen getrieben, mehr als dass ich sie beherrsche.",
     want: "Ich will Ruhe, Geld für Marie und das Kind, und dass die Stimmen endlich schweigen.",
     fear: "Ich fürchte, dass alle über mich verfügen: die Herren, der Doktor, das Militär, sogar mein eigener Kopf.",
-    murder: "Ich erkläre nichts sauber. Was geschieht, kommt aus Kränkung, Wahn, Armut und aus einer Welt, die mich vorher schon zerlegt hat."
+    murder: "Ich erkläre nichts sauber. Was geschieht, kommt aus Kränkung, Wahn, Armut und aus einer Welt, die mich vorher schon zerlegt hat.",
+    relations: "Zu Marie zieht mich Sorge, Liebe und Besitzangst; Andres bleibt nah und doch fern; Hauptmann und Doktor stehen über mir und drücken mich klein.",
+    woyzeck: "Ich bin nicht Herr meiner Lage. Ich bin Soldat, Vater, Versuchskörper und einer, der dauernd beweisen soll, dass er noch Mensch ist.",
+    marie: "Marie ist Nähe, Zuhause und Schmerz. Gerade weil sie mir so viel bedeutet, wird jeder Blick auf sie zu einer Bedrohung.",
+    tambourmajor: "Der Tambourmajor ist das Gegenbild zu mir: Körper, Glanz, Uniform, Kraft. An ihm sehe ich, was mir fehlt und was mich beschämt.",
+    doctorCaptain: "Doktor und Hauptmann reden verschieden, aber beide machen mich zum Objekt: der eine moralisch, der andere wissenschaftlich.",
+    living: "Meine Lebensumstände lassen kaum Luft. Arbeit, Dienst, Experiment und Armut machen aus jedem Gefühl Druck.",
+    poverty: "Armut ist nicht Hintergrund, sie ist täglicher Zwang. Sie bestimmt, was ich esse, was ich ertrage und wie wenig ich widersprechen kann.",
+    love: "Liebe ist für mich nicht frei. Sie ist verwickelt mit Angst, Versorgung, Scham und dem Wunsch, endlich nicht allein zu sein.",
+    jealousy: "Eifersucht macht aus Angst Gewissheit. Sie verengt meinen Blick, bis ich nur noch Zeichen gegen mich sehe.",
+    power: "Macht haben die, die Zeit, Geld, Sprache, Rang und Körperkraft besitzen. Ich habe vor allem Gehorsam gelernt.",
+    guilt: "Schuld liegt bei mir, aber nicht nur bei mir. Das Stück zeigt, wie viele Hände vorher Druck aufbauen.",
+    body: "Mein Körper gehört mir kaum: Er dient, hungert, wird beobachtet und am Ende wird er zur Maschine der Gewalt.",
+    society: "Die Gesellschaft sieht mich von oben, als Fall, Knecht, Sünder oder Sonderling. Selten sieht sie einen Menschen."
   },
   Marie: {
     stand: "Ich stehe zwischen Kind, Armut, Blicken von außen und einem Begehren, das mir kurz ein anderes Leben verspricht.",
     want: "Ich will nicht nur Elend und Pflicht sein. Ich will gesehen werden, ohne gleich verurteilt zu werden.",
     fear: "Ich fürchte die Schande, Woyzecks Blick, die Nachbarinnen und mein eigenes Gewissen.",
-    murder: "Die Gewalt trifft mich, aber sie beginnt nicht erst mit dem Messer. Sie wächst aus Besitzdenken, Not, Demütigung und einer Ordnung, in der ich kaum frei handeln kann."
+    murder: "Die Gewalt trifft mich, aber sie beginnt nicht erst mit dem Messer. Sie wächst aus Besitzdenken, Not, Demütigung und einer Ordnung, in der ich kaum frei handeln kann.",
+    relations: "Zu Woyzeck bin ich gebunden durch Kind, Alltag und Sorge. Der Tambourmajor reizt mich, Margreth beobachtet mich, die Stadt urteilt über mich.",
+    woyzeck: "Woyzeck ist mir nah, aber seine Nähe wird schwer. Er bringt Geld und Sorge, zugleich Angst, Kontrolle und Verstörung.",
+    marie: "Ich bin nicht nur die Schuldige. Ich bin Mutter, Geliebte, Arme, Begehrende und eine Frau, die ständig angesehen und bewertet wird.",
+    tambourmajor: "Der Tambourmajor verspricht Glanz und Körperkraft. Aber sein Begehren bleibt grob und macht mich nicht wirklich frei.",
+    doctorCaptain: "Doktor und Hauptmann gehören zur Welt der Männer, die über andere sprechen. Auch wenn sie nicht immer direkt bei mir sind, prägt ihre Ordnung mein Leben.",
+    living: "Meine Lebensumstände sind eng: Kind, Zimmer, Nachbarschaft, wenig Geld. Jeder Wunsch wird sofort moralisch verdächtig.",
+    poverty: "Armut macht Schmuck, Blick und Begehren gefährlich. Was reich wirkt, wird bei mir sofort zur Schuldfrage.",
+    love: "Liebe ist bei mir gemischt: Zärtlichkeit, Sehnsucht, Körper, Gewissen und Angst vor dem Urteil.",
+    jealousy: "Eifersucht kommt von außen auf mich zu. Sie macht aus meinem Begehren einen Beweis gegen mich.",
+    power: "Macht haben die, die mich ansehen, beurteilen oder besitzen wollen. Ich habe nur kurze Momente der Selbstbehauptung.",
+    guilt: "Ich spüre Schuld, aber die Schuld ist nicht einfach. Mein Wunsch nach Leben entsteht in einer Lage, die mich kaum schützt.",
+    body: "Mein Körper ist begehrt, kontrolliert und verurteilt. An ihm entscheidet die Umwelt über meine Moral.",
+    society: "Die Gesellschaft sieht mich schnell als gefallene Frau. Sie sieht weniger meine Armut und mein Ausgeliefertsein."
   },
   Tambourmajor: {
     stand: "Ich trete auf, wo Körper, Uniform und öffentliches Begehren zählen.",
     want: "Ich will glänzen, gewinnen, besitzen, stärker sein.",
     fear: "Ich fürchte wenig; genau das macht mich gefährlich und stumpf.",
-    murder: "Ich würde die Schuld von mir weisen. Aber meine Prahlerei und Gewalt verschieben die Kräfte im Stück deutlich."
+    murder: "Ich würde die Schuld von mir weisen. Aber meine Prahlerei und Gewalt verschieben die Kräfte im Stück deutlich.",
+    relations: "Marie ist für mich Begehren und Triumph; Woyzeck ist der Unterlegene, an dem ich Stärke zeigen kann.",
+    woyzeck: "Woyzeck wirkt auf mich wie einer, den man verdrängen kann. Gerade darin liegt meine Brutalität.",
+    marie: "Marie zieht mich an, aber ich sehe sie kaum als freie Person. Ich sehe Körper, Reiz und Besitz.",
+    tambourmajor: "Ich bin Auftritt: Uniform, Kraft, Lärm und Selbstgewissheit.",
+    doctorCaptain: "Doktor und Hauptmann stehen für andere Formen von Macht. Meine Macht ist direkter: Körper und Rang.",
+    living: "Meine Lebensumstände geben mir Bühne und Status. Die Uniform arbeitet für mich.",
+    poverty: "Armut sehe ich vor allem bei den anderen. Sie macht Woyzeck klein und mich im Vergleich größer.",
+    love: "Liebe nenne ich eher Begehren. Tiefe Verantwortung passt nicht zu meinem Auftreten.",
+    jealousy: "Eifersucht interessiert mich, solange sie meinen Sieg bestätigt.",
+    power: "Macht ist Körper, Uniform, Lautstärke und öffentliche Wirkung.",
+    guilt: "Schuld weise ich ab. Doch mein Verhalten verschärft Demütigung und Gewalt.",
+    body: "Mein Körper ist mein Kapital. Ich setze ihn ein wie eine Waffe.",
+    society: "Die Gesellschaft bewundert Kraft schneller, als sie fragt, was diese Kraft anrichtet."
   },
   Doktor: {
     stand: "Ich sehe einen interessanten Fall, Symptome, Versuchsanordnung, Material.",
     want: "Ich will Erkenntnis, Ruhm und ein sauberes Experiment.",
     fear: "Ich fürchte vor allem Unordnung in meiner Beobachtung.",
-    murder: "Der Mord erscheint mir als Befund. Gerade diese Kälte zeigt, wie sehr Wissenschaft hier Menschlichkeit verlieren kann."
+    murder: "Der Mord erscheint mir als Befund. Gerade diese Kälte zeigt, wie sehr Wissenschaft hier Menschlichkeit verlieren kann.",
+    relations: "Zu Woyzeck stehe ich als Beobachter und Experimentator. Die anderen Figuren sind für mich eher Kontext als Gegenüber.",
+    woyzeck: "Woyzeck ist mein Fall. Dass er Mensch ist, verschwindet gefährlich leicht hinter dem Experiment.",
+    marie: "Marie interessiert mich vor allem, wenn sie Woyzecks Symptome und Affekte erklärt. Das ist bereits eine Verengung.",
+    tambourmajor: "Der Tambourmajor ist rohe Körperkraft; wissenschaftlich reizt mich eher Woyzecks Abweichung.",
+    doctorCaptain: "Der Hauptmann moralisiert, ich analysiere. Beide Formen können Woyzeck klein machen.",
+    living: "Meine Lebensumstände sind privilegiert: Ich kann beobachten, statt beobachtet zu werden.",
+    poverty: "Armut liefert Versuchspersonen. Das ist der Skandal, den meine Sprache verdeckt.",
+    love: "Liebe ist für mich kein Forschungsbegriff, und genau deshalb unterschätze ich ihre Wirkung.",
+    jealousy: "Eifersucht wäre ein Symptomkomplex. Als Mensch müsste man anders darüber sprechen.",
+    power: "Macht heißt hier: benennen, messen, klassifizieren und über den Körper eines anderen verfügen.",
+    guilt: "Meine Schuld liegt in der Kälte des Blicks. Ich sehe Erkenntnis, wo ich Verantwortung sehen müsste.",
+    body: "Der Körper ist mein Untersuchungsfeld. Aber im Stück wird sichtbar, wie gewaltsam dieser Blick sein kann.",
+    society: "Die Gesellschaft nennt meine Kälte Bildung und Fortschritt. Das macht sie nicht unschuldig."
   },
   Hauptmann: {
     stand: "Ich rede von Tugend, Langsamkeit und Moral, während andere für mich arbeiten.",
     want: "Ich will überlegen bleiben und meine Ordnung bestätigt sehen.",
     fear: "Ich fürchte Unruhe, Hast und alles, was meine moralische Bequemlichkeit stört.",
-    murder: "Ich moralisiere die Tat, aber meine Demütigungen gehören zum Druck, der vorher aufgebaut wird."
+    murder: "Ich moralisiere die Tat, aber meine Demütigungen gehören zum Druck, der vorher aufgebaut wird.",
+    relations: "Zu Woyzeck spreche ich von oben herab; mit dem Doktor teile ich die Lust, andere zu beurteilen.",
+    woyzeck: "Woyzeck ist für mich einer, an dem ich Moral demonstrieren kann. Ich übersehe dabei seine Not.",
+    marie: "Marie erscheint mir durch die Brille der Moral. Ihre Lage interessiert mich weniger als ihr vermeintlicher Fehltritt.",
+    tambourmajor: "Der Tambourmajor ist mir zu körperlich und laut, aber seine Rangordnung gehört zur gleichen Welt.",
+    doctorCaptain: "Der Doktor ist mir unheimlich und doch verwandt: Auch er erhebt sich über Woyzeck.",
+    living: "Meine Lebensumstände erlauben Langsamkeit und Moralreden. Das ist ein Luxus.",
+    poverty: "Armut verwandle ich in eine Tugendfrage. Damit mache ich es mir bequem.",
+    love: "Liebe beurteile ich schnell moralisch, ohne ihre Notlage zu verstehen.",
+    jealousy: "Eifersucht gilt mir als Unordnung der unteren Leute. Ich sehe nicht, wie meine Worte sie nähren.",
+    power: "Macht ist Rang, Sprache, Zeit und die Freiheit, andere zu beschämen.",
+    guilt: "Meine Schuld liegt im Spott, der sich als Moral verkleidet.",
+    body: "Der Körper des anderen bedient mich. Selbst beim Rasieren bleibe ich der Herr.",
+    society: "Die Gesellschaft schützt Leute wie mich, weil unsere Gewalt höflich klingt."
   },
   Andres: {
     stand: "Ich stehe neben Woyzeck und verstehe oft nur den Alltag, nicht den Abgrund.",
@@ -836,11 +902,63 @@ function characterSceneMatch(scene, character) {
   });
 }
 
+function inferQuestionKey(questionText) {
+  const text = questionText.toLowerCase();
+  if (text.includes("woyzeck") || text.includes("franz")) return "woyzeck";
+  if (text.includes("marie")) return "marie";
+  if (text.includes("tambour")) return "tambourmajor";
+  if (text.includes("doktor") || text.includes("hauptmann")) return "doctorCaptain";
+  if (text.includes("liebe") || text.includes("lieb")) return "love";
+  if (text.includes("eifersucht") || text.includes("eifer")) return "jealousy";
+  if (text.includes("macht") || text.includes("herrschaft") || text.includes("gewalt")) return "power";
+  if (text.includes("armut") || text.includes("geld") || text.includes("arbeit")) return "poverty";
+  if (text.includes("leben") || text.includes("umstand") || text.includes("milieu")) return "living";
+  if (text.includes("schuld") || text.includes("gewissen")) return "guilt";
+  if (text.includes("körper") || text.includes("leib")) return "body";
+  if (text.includes("gesellschaft") || text.includes("leute") || text.includes("stadt")) return "society";
+  if (text.includes("angst") || text.includes("furcht")) return "fear";
+  if (text.includes("will") || text.includes("wunsch") || text.includes("willst")) return "want";
+  if (text.includes("mord") || text.includes("messer") || text.includes("tot")) return "murder";
+  if (text.includes("verhältnis") || text.includes("anderen") || text.includes("person")) return "relations";
+  return "stand";
+}
+
+function fallbackVoice(character, questionKey) {
+  const labels = {
+    relations: "Meine Beziehungen zeigen, wer Nähe, Druck oder Urteil in dieser Fassung ausübt.",
+    woyzeck: "Woyzeck steht hier für den Punkt, an dem Armut, Körperdruck und soziale Demütigung sichtbar werden.",
+    marie: "Marie macht sichtbar, wie Begehren, Armut, Schuld und gesellschaftlicher Blick ineinandergreifen.",
+    tambourmajor: "Der Tambourmajor bringt Körpermacht, Begehren und öffentliche Kränkung in die Handlung.",
+    doctorCaptain: "Doktor und Hauptmann zeigen, wie Institutionen über Menschen sprechen und sie dadurch kleiner machen.",
+    living: "Meine Lebensumstände sind kein Hintergrund, sondern bestimmen, was ich sehen, sagen und tun kann.",
+    poverty: "Armut verengt Handlungsspielräume und macht moralische Urteile oft grausam einfach.",
+    love: "Liebe ist in dieser Welt nie nur privat; sie hängt an Geld, Körper, Angst und Anerkennung.",
+    jealousy: "Eifersucht verwandelt Unsicherheit in Verdacht und macht die Zeichen der Welt bedrohlich.",
+    power: "Macht zeigt sich daran, wer sprechen, urteilen, besitzen, beobachten oder körperlich auftreten darf.",
+    guilt: "Schuld verteilt sich nicht sauber auf eine Person; die Montage zeigt mehrere Schichten von Verantwortung.",
+    body: "Der Körper ist nicht frei: Er wird begehrt, gedemütigt, untersucht, eingesetzt oder verletzt.",
+    society: "Die Gesellschaft schaut zu, redet mit und macht aus privater Not ein öffentliches Urteil.",
+    stand: "Ich antworte aus dem Stand der bisher montierten Szenen, nicht aus einer fertigen Gesamtfassung."
+  };
+  return labels[questionKey] || labels.stand;
+}
+
+function escapeHtml(text) {
+  return text.replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    "\"": "&quot;",
+    "'": "&#039;"
+  })[char]);
+}
+
 function buildInterview() {
   const character = characterSelect.value;
-  const question = questionSelect.value;
+  const customQuestion = customQuestionInput.value.trim();
+  const question = customQuestion ? inferQuestionKey(customQuestion) : questionSelect.value;
   const sequence = build.map(sceneById).filter(Boolean);
-  const voice = characterVoices[character][question];
+  const voice = characterVoices[character][question] || fallbackVoice(character, question);
   if (!sequence.length) {
     interviewOutput.textContent = `${character}: Ich kann noch nichts aus dieser Fassung wissen. Es ist noch keine Szene gesetzt.`;
     return;
@@ -857,8 +975,9 @@ function buildInterview() {
   const limit = murderKnown
     ? `Der Mord ist in dieser Montage bereits an Position ${murderPos} gesetzt; alles, was ich sage, steht unter diesem Wissen.`
     : "Der Mord ist in dieser Montage noch nicht gesetzt; ich kann ihn nur als Möglichkeit, Drohung oder blinden Fleck berühren.";
+  const asked = customQuestion ? `Auf deine Frage „${escapeHtml(customQuestion)}“ antworte ich so: ` : "";
 
-  interviewOutput.innerHTML = `<strong>${character}:</strong> ${voice} ${knowledge} ${limit} Die bisherige Handlung wird von ${motifs} bestimmt.`;
+  interviewOutput.innerHTML = `<strong>${character}:</strong> ${asked}${voice} ${knowledge} ${limit} Die bisherige Handlung wird von ${motifs} bestimmt.`;
 }
 
 function exportBuild() {
@@ -941,6 +1060,7 @@ document.querySelector("#resetBtn").addEventListener("click", () => {
   stepStartSelect.value = "1";
   characterSelect.value = "Franz Woyzeck";
   questionSelect.value = "stand";
+  customQuestionInput.value = "";
   interviewOutput.textContent = "Wähle eine Figur und starte ein Gespräch.";
   clearPins();
   build = [];
@@ -975,6 +1095,11 @@ modeSelect.addEventListener("change", () => {
 stepDirectionSelect.addEventListener("change", renderStepState);
 characterSelect.addEventListener("change", buildInterview);
 questionSelect.addEventListener("change", buildInterview);
+customQuestionInput.addEventListener("keydown", (event) => {
+  if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+    buildInterview();
+  }
+});
 
 populateFilters();
 populateCombiner();
