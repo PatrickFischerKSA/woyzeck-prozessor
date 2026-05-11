@@ -683,6 +683,12 @@ function chooseRandomStep() {
   chooseStep(available[Math.floor(Math.random() * available.length)]);
 }
 
+function resetStepGame() {
+  build = [];
+  saveBuild();
+  renderBuild();
+}
+
 function renderStepState() {
   const direction = stepDirectionSelect.value;
   stepStartLabel.textContent = direction === "backward" ? "Schlussszene" : "Anfangsszene";
@@ -1197,6 +1203,7 @@ processorDialog.addEventListener("click", (event) => {
 document.querySelector("#startStepBtn").addEventListener("click", startStepGame);
 document.querySelector("#chooseStepBtn").addEventListener("click", () => chooseStep());
 document.querySelector("#randomStepBtn").addEventListener("click", chooseRandomStep);
+document.querySelector("#resetStepBtn").addEventListener("click", resetStepGame);
 document.querySelector("#interviewBtn").addEventListener("click", buildInterview);
 listenBtn.addEventListener("click", startListening);
 speakAnswerBtn.addEventListener("click", speakInterviewAnswer);

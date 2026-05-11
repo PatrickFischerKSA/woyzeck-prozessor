@@ -82,6 +82,13 @@ button:hover {
   font-weight: 850;
 }
 
+.danger-btn {
+  border-color: rgba(156, 47, 54, 0.42);
+  background: rgba(156, 47, 54, 0.14);
+  color: var(--accent);
+  font-weight: 850;
+}
+
 .topbar {
   position: sticky;
   top: 0;
