@@ -2,12 +2,14 @@
   --ink: #1f2326;
   --muted: #5f686e;
   --paper: #f7f2e9;
-  --panel: #fffdf8;
-  --line: #d8cdbd;
+  --panel: rgba(255, 253, 248, 0.58);
+  --glass: rgba(255, 253, 248, 0.48);
+  --glass-strong: rgba(255, 253, 248, 0.68);
+  --line: rgba(216, 205, 189, 0.62);
   --accent: #9c2f36;
   --accent-2: #246b69;
   --accent-3: #b88a2b;
-  --shadow: 0 16px 40px rgba(47, 38, 30, 0.12);
+  --shadow: 0 16px 44px rgba(20, 18, 16, 0.2);
 }
 
 * {
@@ -18,13 +20,37 @@ body {
   margin: 0;
   min-height: 100vh;
   color: var(--ink);
-  background:
-    linear-gradient(rgba(247, 242, 233, 0.88), rgba(247, 242, 233, 0.94)),
-    repeating-linear-gradient(90deg, rgba(31, 35, 38, 0.06) 0 1px, transparent 1px 56px),
-    radial-gradient(circle at 20% 20%, rgba(156, 47, 54, 0.16), transparent 34%),
-    radial-gradient(circle at 85% 10%, rgba(36, 107, 105, 0.13), transparent 30%),
-    var(--paper);
+  background: #161512;
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.background-video {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  pointer-events: none;
+  filter: saturate(0.82) contrast(1.08) brightness(0.72);
+}
+
+.background-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(247, 242, 233, 0.42), rgba(247, 242, 233, 0.58)),
+    repeating-linear-gradient(90deg, rgba(31, 35, 38, 0.05) 0 1px, transparent 1px 56px),
+    radial-gradient(circle at 18% 18%, rgba(156, 47, 54, 0.17), transparent 34%),
+    radial-gradient(circle at 86% 12%, rgba(36, 107, 105, 0.15), transparent 30%);
+}
+
+.topbar,
+.app-shell {
+  position: relative;
+  z-index: 2;
 }
 
 button,
@@ -37,11 +63,12 @@ textarea {
 button {
   border: 1px solid var(--line);
   border-radius: 6px;
-  background: #fffaf1;
+  background: rgba(255, 250, 241, 0.64);
   color: var(--ink);
   min-height: 40px;
   padding: 0 14px;
   cursor: pointer;
+  backdrop-filter: blur(14px) saturate(1.12);
 }
 
 button:hover {
@@ -65,8 +92,8 @@ button:hover {
   gap: 18px;
   padding: 18px clamp(16px, 4vw, 42px);
   border-bottom: 1px solid rgba(80, 68, 54, 0.22);
-  background: rgba(247, 242, 233, 0.92);
-  backdrop-filter: blur(14px);
+  background: rgba(247, 242, 233, 0.5);
+  backdrop-filter: blur(18px) saturate(1.15);
 }
 
 h1,
@@ -143,10 +170,11 @@ h2 {
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 7px 10px;
-  background: rgba(255, 253, 248, 0.72);
+  background: rgba(255, 253, 248, 0.52);
   color: var(--muted);
   font-size: 0.82rem;
   font-weight: 700;
+  backdrop-filter: blur(14px) saturate(1.1);
 }
 
 .controls {
@@ -165,9 +193,10 @@ h2 {
   border: 1px solid rgba(184, 138, 43, 0.28);
   border-radius: 8px;
   padding: 10px 12px;
-  background: rgba(255, 250, 241, 0.78);
+  background: rgba(255, 250, 241, 0.48);
   color: var(--muted);
   line-height: 1.4;
+  backdrop-filter: blur(16px) saturate(1.12);
 }
 
 .source-note strong {
@@ -188,8 +217,9 @@ h2 {
   border: 1px solid rgba(36, 107, 105, 0.22);
   border-radius: 8px;
   padding: 14px;
-  background: rgba(255, 253, 248, 0.82);
+  background: var(--glass);
   box-shadow: var(--shadow);
+  backdrop-filter: blur(18px) saturate(1.14);
 }
 
 .combiner-head,
@@ -255,8 +285,9 @@ h2 {
   border: 1px solid rgba(184, 138, 43, 0.24);
   border-radius: 8px;
   padding: 14px;
-  background: rgba(255, 250, 241, 0.78);
+  background: var(--glass-strong);
   min-height: 150px;
+  backdrop-filter: blur(18px) saturate(1.12);
 }
 
 .step-status h3 {
@@ -331,6 +362,7 @@ textarea {
   border-radius: 6px;
   background: var(--panel);
   color: var(--ink);
+  backdrop-filter: blur(14px) saturate(1.1);
 }
 
 input,
@@ -352,10 +384,11 @@ textarea {
 
 .scene-card,
 .processor {
-  border: 1px solid rgba(80, 68, 54, 0.2);
+  border: 1px solid rgba(255, 253, 248, 0.32);
   border-radius: 8px;
-  background: rgba(255, 253, 248, 0.9);
+  background: var(--glass);
   box-shadow: var(--shadow);
+  backdrop-filter: blur(18px) saturate(1.15);
 }
 
 .scene-card {
@@ -444,7 +477,7 @@ dd {
 
 .chip {
   border-radius: 999px;
-  background: rgba(36, 107, 105, 0.11);
+  background: rgba(36, 107, 105, 0.18);
   color: #174d4c;
   padding: 4px 8px;
   font-size: 0.78rem;
@@ -454,7 +487,7 @@ dd {
 .add-btn {
   justify-self: start;
   border-color: rgba(36, 107, 105, 0.35);
-  background: #eff7f3;
+  background: rgba(239, 247, 243, 0.66);
   color: #174d4c;
   font-weight: 800;
 }
@@ -486,12 +519,13 @@ dd {
   padding: 12px;
   border: 1px dashed rgba(80, 68, 54, 0.36);
   border-radius: 8px;
-  background: rgba(255, 250, 241, 0.64);
+  background: rgba(255, 250, 241, 0.28);
+  backdrop-filter: blur(16px) saturate(1.1);
 }
 
 .build-list.drag-over {
   border-color: var(--accent-2);
-  background: rgba(36, 107, 105, 0.08);
+  background: rgba(36, 107, 105, 0.16);
 }
 
 .build-item {
@@ -502,7 +536,8 @@ dd {
   border: 1px solid var(--line);
   border-radius: 6px;
   padding: 8px;
-  background: var(--panel);
+  background: var(--glass-strong);
+  backdrop-filter: blur(14px) saturate(1.1);
 }
 
 .build-item strong {
@@ -543,8 +578,9 @@ dd {
   border: 1px solid rgba(36, 107, 105, 0.18);
   border-radius: 8px;
   padding: 12px;
-  background: rgba(239, 247, 243, 0.58);
+  background: rgba(239, 247, 243, 0.42);
   overflow: auto;
+  backdrop-filter: blur(18px) saturate(1.12);
 }
 
 .reading-output h2 {
@@ -611,7 +647,9 @@ dd {
   .library,
   .build-actions,
   .mini-actions,
-  .notes span {
+  .notes span,
+  .background-video,
+  .background-scrim {
     display: none;
   }
 
