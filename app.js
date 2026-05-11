@@ -306,6 +306,10 @@ const figureFilter = document.querySelector("#figureFilter");
 const visibleCount = document.querySelector("#visibleCount");
 const buildList = document.querySelector("#buildList");
 const buildCount = document.querySelector("#buildCount");
+const floatingBuildCount = document.querySelector("#floatingBuildCount");
+const processorDialog = document.querySelector("#processorDialog");
+const openProcessorBtn = document.querySelector("#openProcessorBtn");
+const closeProcessorBtn = document.querySelector("#closeProcessorBtn");
 const notesInput = document.querySelector("#notesInput");
 const modeSelect = document.querySelector("#modeSelect");
 const firstSceneSelect = document.querySelector("#firstSceneSelect");
@@ -790,7 +794,9 @@ function renderBuild() {
     removeBtn.addEventListener("click", () => removeScene(index));
     buildList.append(item);
   });
-  buildCount.textContent = `${build.length} ${build.length === 1 ? "Szene" : "Szenen"}`;
+  const countText = `${build.length} ${build.length === 1 ? "Szene" : "Szenen"}`;
+  buildCount.textContent = countText;
+  floatingBuildCount.textContent = countText;
   renderReading();
   renderStepState();
 }
@@ -1177,6 +1183,17 @@ document.querySelector("#printBtn").addEventListener("click", () => window.print
 document.querySelector("#generateBtn").addEventListener("click", generateCombination);
 document.querySelector("#refreshReadingBtn").addEventListener("click", renderReading);
 document.querySelector("#clearPinsBtn").addEventListener("click", clearPins);
+openProcessorBtn.addEventListener("click", () => {
+  if (typeof processorDialog.showModal === "function") {
+    processorDialog.showModal();
+  } else {
+    processorDialog.setAttribute("open", "");
+  }
+});
+closeProcessorBtn.addEventListener("click", () => processorDialog.close());
+processorDialog.addEventListener("click", (event) => {
+  if (event.target === processorDialog) processorDialog.close();
+});
 document.querySelector("#startStepBtn").addEventListener("click", startStepGame);
 document.querySelector("#chooseStepBtn").addEventListener("click", () => chooseStep());
 document.querySelector("#randomStepBtn").addEventListener("click", chooseRandomStep);

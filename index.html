@@ -24,6 +24,11 @@
       </div>
     </header>
 
+    <button id="openProcessorBtn" class="open-processor-btn" type="button">
+      <span>Meine Fassung</span>
+      <strong id="floatingBuildCount">0 Szenen</strong>
+    </button>
+
     <main class="app-shell">
       <section class="library" aria-labelledby="libraryTitle">
         <div class="panel-head">
@@ -199,14 +204,19 @@
 
         <div id="cardGrid" class="card-grid" aria-live="polite"></div>
       </section>
+    </main>
 
+    <dialog id="processorDialog" class="processor-dialog">
       <aside class="processor" aria-labelledby="processorTitle">
         <div class="processor-head">
           <div>
             <h2 id="processorTitle">Meine Fassung</h2>
             <p>Ziehe Karten hierhin oder nutze „Hinzufügen“. Danach kannst du die Reihenfolge verschieben.</p>
           </div>
-          <span id="buildCount" class="counter">0 Szenen</span>
+          <div class="processor-head-actions">
+            <span id="buildCount" class="counter">0 Szenen</span>
+            <button id="closeProcessorBtn" class="icon-btn" type="button" title="Fenster schließen">×</button>
+          </div>
         </div>
 
         <div class="build-actions">
@@ -240,7 +250,7 @@
           <textarea id="notesInput" rows="7" placeholder="Warum diese Ordnung? Welche Motive werden stärker?"></textarea>
         </label>
       </aside>
-    </main>
+    </dialog>
 
     <template id="sceneCardTemplate">
       <article class="scene-card" draggable="true">
