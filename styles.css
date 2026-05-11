@@ -2,10 +2,10 @@
   --ink: #1f2326;
   --muted: #5f686e;
   --paper: #f7f2e9;
-  --panel: rgba(255, 253, 248, 0.58);
-  --glass: rgba(255, 253, 248, 0.48);
-  --glass-strong: rgba(255, 253, 248, 0.68);
-  --line: rgba(216, 205, 189, 0.62);
+  --panel: rgba(255, 253, 248, 0.26);
+  --glass: rgba(255, 253, 248, 0.18);
+  --glass-strong: rgba(255, 253, 248, 0.34);
+  --line: rgba(255, 253, 248, 0.46);
   --accent: #9c2f36;
   --accent-2: #246b69;
   --accent-3: #b88a2b;
@@ -41,10 +41,10 @@ body {
   z-index: 1;
   pointer-events: none;
   background:
-    linear-gradient(rgba(247, 242, 233, 0.42), rgba(247, 242, 233, 0.58)),
+    linear-gradient(rgba(247, 242, 233, 0.12), rgba(247, 242, 233, 0.25)),
     repeating-linear-gradient(90deg, rgba(31, 35, 38, 0.05) 0 1px, transparent 1px 56px),
-    radial-gradient(circle at 18% 18%, rgba(156, 47, 54, 0.17), transparent 34%),
-    radial-gradient(circle at 86% 12%, rgba(36, 107, 105, 0.15), transparent 30%);
+    radial-gradient(circle at 18% 18%, rgba(156, 47, 54, 0.1), transparent 34%),
+    radial-gradient(circle at 86% 12%, rgba(36, 107, 105, 0.1), transparent 30%);
 }
 
 .topbar,
@@ -63,7 +63,7 @@ textarea {
 button {
   border: 1px solid var(--line);
   border-radius: 6px;
-  background: rgba(255, 250, 241, 0.64);
+  background: rgba(255, 250, 241, 0.32);
   color: var(--ink);
   min-height: 40px;
   padding: 0 14px;
@@ -92,7 +92,7 @@ button:hover {
   gap: 18px;
   padding: 18px clamp(16px, 4vw, 42px);
   border-bottom: 1px solid rgba(80, 68, 54, 0.22);
-  background: rgba(247, 242, 233, 0.5);
+  background: rgba(247, 242, 233, 0.22);
   backdrop-filter: blur(18px) saturate(1.15);
 }
 
@@ -138,7 +138,7 @@ h2 {
 
 .app-shell {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(340px, 430px);
+  grid-template-columns: minmax(0, 1fr) minmax(460px, 560px);
   gap: 22px;
   padding: 22px clamp(16px, 4vw, 42px) 42px;
 }
@@ -170,7 +170,7 @@ h2 {
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 7px 10px;
-  background: rgba(255, 253, 248, 0.52);
+  background: rgba(255, 253, 248, 0.24);
   color: var(--muted);
   font-size: 0.82rem;
   font-weight: 700;
@@ -193,7 +193,7 @@ h2 {
   border: 1px solid rgba(184, 138, 43, 0.28);
   border-radius: 8px;
   padding: 10px 12px;
-  background: rgba(255, 250, 241, 0.48);
+  background: rgba(255, 250, 241, 0.2);
   color: var(--muted);
   line-height: 1.4;
   backdrop-filter: blur(16px) saturate(1.12);
@@ -219,7 +219,7 @@ h2 {
   padding: 14px;
   background: var(--glass);
   box-shadow: var(--shadow);
-  backdrop-filter: blur(18px) saturate(1.14);
+  backdrop-filter: blur(12px) saturate(1.08);
 }
 
 .combiner-head,
@@ -285,9 +285,9 @@ h2 {
   border: 1px solid rgba(184, 138, 43, 0.24);
   border-radius: 8px;
   padding: 14px;
-  background: var(--glass-strong);
+  background: rgba(255, 250, 241, 0.2);
   min-height: 150px;
-  backdrop-filter: blur(18px) saturate(1.12);
+  backdrop-filter: blur(12px) saturate(1.08);
 }
 
 .step-status h3 {
@@ -388,7 +388,7 @@ textarea {
   border-radius: 8px;
   background: var(--glass);
   box-shadow: var(--shadow);
-  backdrop-filter: blur(18px) saturate(1.15);
+  backdrop-filter: blur(12px) saturate(1.08);
 }
 
 .scene-card {
@@ -494,33 +494,69 @@ dd {
 
 .processor {
   position: sticky;
-  top: 98px;
+  top: 92px;
   align-self: start;
-  max-height: calc(100vh - 118px);
+  max-height: calc(100vh - 104px);
   display: flex;
   flex-direction: column;
-  padding: 16px;
+  padding: 28px 30px;
+  border-width: 2px;
+}
+
+.processor-head {
+  align-items: center;
+  margin-bottom: 22px;
+}
+
+.processor-head h2 {
+  font-size: clamp(2.8rem, 5vw, 4.8rem);
+  line-height: 0.95;
+  letter-spacing: 0;
+}
+
+.processor-head p {
+  max-width: 11em;
+  margin-top: 16px;
+  color: rgba(31, 35, 38, 0.78);
+  font-size: clamp(1.25rem, 2.4vw, 2rem);
+  line-height: 1.18;
+}
+
+.processor-head .counter {
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: rgba(255, 253, 248, 0.34);
+  color: var(--ink);
+  font-size: clamp(1rem, 2vw, 1.45rem);
+  font-weight: 900;
 }
 
 .build-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.build-actions button {
+  min-height: 58px;
+  background: rgba(255, 250, 241, 0.3);
+  font-size: clamp(1rem, 1.7vw, 1.35rem);
+  font-weight: 800;
 }
 
 .build-list {
-  min-height: 190px;
+  min-height: clamp(260px, 36vh, 430px);
   overflow: auto;
   display: grid;
   align-content: start;
   gap: 8px;
-  margin: 0 0 14px;
-  padding: 12px;
-  border: 1px dashed rgba(80, 68, 54, 0.36);
+  margin: 0 0 20px;
+  padding: 16px;
+  border: 2px dashed rgba(255, 253, 248, 0.5);
   border-radius: 8px;
-  background: rgba(255, 250, 241, 0.28);
-  backdrop-filter: blur(16px) saturate(1.1);
+  background: rgba(255, 250, 241, 0.12);
+  backdrop-filter: blur(10px) saturate(1.05);
 }
 
 .build-list.drag-over {
@@ -536,7 +572,7 @@ dd {
   border: 1px solid var(--line);
   border-radius: 6px;
   padding: 8px;
-  background: var(--glass-strong);
+  background: rgba(255, 253, 248, 0.28);
   backdrop-filter: blur(14px) saturate(1.1);
 }
 
@@ -577,14 +613,14 @@ dd {
   margin-bottom: 14px;
   border: 1px solid rgba(36, 107, 105, 0.18);
   border-radius: 8px;
-  padding: 12px;
-  background: rgba(239, 247, 243, 0.42);
+  padding: 16px;
+  background: rgba(239, 247, 243, 0.22);
   overflow: auto;
-  backdrop-filter: blur(18px) saturate(1.12);
+  backdrop-filter: blur(12px) saturate(1.08);
 }
 
 .reading-output h2 {
-  font-size: 1.05rem;
+  font-size: 1.45rem;
 }
 
 .reading-output h3 {
@@ -596,6 +632,7 @@ dd {
 
 .reading-output p {
   color: #34383b;
+  font-size: 1.05rem;
   line-height: 1.45;
 }
 
@@ -611,6 +648,14 @@ dd {
   .processor {
     position: static;
     max-height: none;
+  }
+
+  .processor-head h2 {
+    font-size: clamp(2.2rem, 10vw, 3.8rem);
+  }
+
+  .processor-head p {
+    max-width: 18em;
   }
 }
 
@@ -635,6 +680,14 @@ dd {
   .panel-head,
   .processor-head {
     display: grid;
+  }
+
+  .processor {
+    padding: 20px;
+  }
+
+  .build-actions {
+    grid-template-columns: 1fr;
   }
 }
 
