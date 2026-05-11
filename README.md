@@ -31,9 +31,13 @@ http://localhost:4173/
 - Letzte Szene festlegen: Schluss fixieren, Rest zufällig.
 - Mehrere Szenen festlegen: beliebige Positionen fixieren, offene Stellen werden zufällig gefüllt.
 - Totales Woyzeck-Puzzle: alle Positionen können manuell gesetzt werden.
+- Szene für Szene vorwärts: Anfangsszene wählen, Zwischenstand lesen, nächste Szene wählen.
+- Thinking Backwards: Schlussszene wählen, Zwischenstand lesen, vorherige Szene wählen.
 
 Nach jeder generierten oder manuell gebauten Reihenfolge erstellt die App automatisch:
 
 - eine Zusammenfassung der Handlung in der erzeugten Reihenfolge,
 - eine Interpretation der Entwicklung von Woyzeck und Marie,
 - eine Erklärung des Mords abhängig von Position, Vorzeichen und Nachspiel der Montage.
+
+Zusätzlich können Figureninterviews geführt werden. Die Antworten von Franz Woyzeck, Marie, Tambourmajor, Doktor, Hauptmann, Andres, Margreth, Narr, Jude und Wirt beziehen sich jeweils nur auf den aktuell entwickelten Stand der Dramenhandlung.

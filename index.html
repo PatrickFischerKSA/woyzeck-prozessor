@@ -53,6 +53,8 @@
                 <option value="last">c. Letzte Szene festlegen</option>
                 <option value="pinned">d. Mehrere Szenen festlegen</option>
                 <option value="puzzle">Totales Woyzeck-Puzzle</option>
+                <option value="step-forward">Szene für Szene vorwärts</option>
+                <option value="step-backward">Thinking Backwards</option>
               </select>
             </label>
             <label>
@@ -73,6 +75,77 @@
             </div>
             <div id="pinGrid" class="pin-grid" aria-label="Szenenpositionen festlegen"></div>
           </details>
+        </section>
+
+        <section class="step-game" aria-labelledby="stepGameTitle">
+          <div class="combiner-head">
+            <div>
+              <h2 id="stepGameTitle">Szene für Szene</h2>
+              <p>Vorwärts: Anfang wählen und jeweils die nächste Szene bestimmen. Rückwärts: Ende wählen und die Vorgeschichte Schritt für Schritt rekonstruieren.</p>
+            </div>
+            <span id="stepProgress" class="counter">0 / 27</span>
+          </div>
+
+          <div class="mode-grid">
+            <label>
+              <span>Spielrichtung</span>
+              <select id="stepDirectionSelect">
+                <option value="forward">Vorwärts erzählen</option>
+                <option value="backward">Vom Ende her denken</option>
+              </select>
+            </label>
+            <label>
+              <span id="stepStartLabel">Anfangsszene</span>
+              <select id="stepStartSelect"></select>
+            </label>
+            <div class="stacked-actions">
+              <button id="startStepBtn" class="primary-btn" type="button">Spiel starten</button>
+              <button id="randomStepBtn" type="button">Zufallsschritt</button>
+            </div>
+          </div>
+
+          <div class="step-picker">
+            <label>
+              <span id="nextStepLabel">Darauffolgende Szene</span>
+              <select id="nextStepSelect"></select>
+            </label>
+            <button id="chooseStepBtn" type="button">Schritt übernehmen</button>
+          </div>
+
+          <div class="step-status">
+            <h3>Zwischenhalt</h3>
+            <p id="stepStoryOutput">Starte ein Schrittspiel, dann erscheint hier nach jeder Wahl der aktuelle Stand der Dramenhandlung.</p>
+          </div>
+        </section>
+
+        <section class="interviews" aria-labelledby="interviewTitle">
+          <div class="combiner-head">
+            <div>
+              <h2 id="interviewTitle">Figurengespräche</h2>
+              <p>Interviews reagieren nur auf die Szenen, die in deiner aktuellen Fassung bis jetzt entwickelt sind.</p>
+            </div>
+            <button id="interviewBtn" class="primary-btn" type="button">Befragen</button>
+          </div>
+
+          <div class="interview-grid">
+            <label>
+              <span>Figur</span>
+              <select id="characterSelect"></select>
+            </label>
+            <label>
+              <span>Frage</span>
+              <select id="questionSelect">
+                <option value="stand">Was ist bis jetzt geschehen?</option>
+                <option value="want">Was willst du gerade?</option>
+                <option value="fear">Wovor hast du Angst?</option>
+                <option value="murder">Wie erklärst du die Gewalt?</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="interview-output" id="interviewOutput">
+            Wähle eine Figur und starte ein Gespräch.
+          </div>
         </section>
 
         <div class="controls" aria-label="Filter">

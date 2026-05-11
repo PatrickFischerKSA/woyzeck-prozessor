@@ -315,9 +315,108 @@ const pinGrid = document.querySelector("#pinGrid");
 const plotOutput = document.querySelector("#plotOutput");
 const interpretationOutput = document.querySelector("#interpretationOutput");
 const murderOutput = document.querySelector("#murderOutput");
+const stepDirectionSelect = document.querySelector("#stepDirectionSelect");
+const stepStartSelect = document.querySelector("#stepStartSelect");
+const stepStartLabel = document.querySelector("#stepStartLabel");
+const nextStepSelect = document.querySelector("#nextStepSelect");
+const nextStepLabel = document.querySelector("#nextStepLabel");
+const stepProgress = document.querySelector("#stepProgress");
+const stepStoryOutput = document.querySelector("#stepStoryOutput");
+const characterSelect = document.querySelector("#characterSelect");
+const questionSelect = document.querySelector("#questionSelect");
+const interviewOutput = document.querySelector("#interviewOutput");
 
 let build = JSON.parse(localStorage.getItem("woyzeckBuild") || "[]");
 notesInput.value = localStorage.getItem("woyzeckNotes") || "";
+
+const interviewCharacters = [
+  "Franz Woyzeck",
+  "Marie",
+  "Tambourmajor",
+  "Doktor",
+  "Hauptmann",
+  "Andres",
+  "Margreth",
+  "Narr",
+  "Jude",
+  "Wirt"
+];
+
+const characterAliases = {
+  "Franz Woyzeck": ["Woyzeck"],
+  Marie: ["Marie"],
+  Tambourmajor: ["Tambourmajor"],
+  Doktor: ["Doktor"],
+  Hauptmann: ["Hauptmann"],
+  Andres: ["Andres"],
+  Margreth: ["Margreth"],
+  Narr: ["Narr / Idiot"],
+  Jude: ["Krämer / Jude"],
+  Wirt: ["Wirtshaus", "Leute", "Volk"]
+};
+
+const characterVoices = {
+  "Franz Woyzeck": {
+    stand: "Ich bin durch die Szenen getrieben, mehr als dass ich sie beherrsche.",
+    want: "Ich will Ruhe, Geld für Marie und das Kind, und dass die Stimmen endlich schweigen.",
+    fear: "Ich fürchte, dass alle über mich verfügen: die Herren, der Doktor, das Militär, sogar mein eigener Kopf.",
+    murder: "Ich erkläre nichts sauber. Was geschieht, kommt aus Kränkung, Wahn, Armut und aus einer Welt, die mich vorher schon zerlegt hat."
+  },
+  Marie: {
+    stand: "Ich stehe zwischen Kind, Armut, Blicken von außen und einem Begehren, das mir kurz ein anderes Leben verspricht.",
+    want: "Ich will nicht nur Elend und Pflicht sein. Ich will gesehen werden, ohne gleich verurteilt zu werden.",
+    fear: "Ich fürchte die Schande, Woyzecks Blick, die Nachbarinnen und mein eigenes Gewissen.",
+    murder: "Die Gewalt trifft mich, aber sie beginnt nicht erst mit dem Messer. Sie wächst aus Besitzdenken, Not, Demütigung und einer Ordnung, in der ich kaum frei handeln kann."
+  },
+  Tambourmajor: {
+    stand: "Ich trete auf, wo Körper, Uniform und öffentliches Begehren zählen.",
+    want: "Ich will glänzen, gewinnen, besitzen, stärker sein.",
+    fear: "Ich fürchte wenig; genau das macht mich gefährlich und stumpf.",
+    murder: "Ich würde die Schuld von mir weisen. Aber meine Prahlerei und Gewalt verschieben die Kräfte im Stück deutlich."
+  },
+  Doktor: {
+    stand: "Ich sehe einen interessanten Fall, Symptome, Versuchsanordnung, Material.",
+    want: "Ich will Erkenntnis, Ruhm und ein sauberes Experiment.",
+    fear: "Ich fürchte vor allem Unordnung in meiner Beobachtung.",
+    murder: "Der Mord erscheint mir als Befund. Gerade diese Kälte zeigt, wie sehr Wissenschaft hier Menschlichkeit verlieren kann."
+  },
+  Hauptmann: {
+    stand: "Ich rede von Tugend, Langsamkeit und Moral, während andere für mich arbeiten.",
+    want: "Ich will überlegen bleiben und meine Ordnung bestätigt sehen.",
+    fear: "Ich fürchte Unruhe, Hast und alles, was meine moralische Bequemlichkeit stört.",
+    murder: "Ich moralisiere die Tat, aber meine Demütigungen gehören zum Druck, der vorher aufgebaut wird."
+  },
+  Andres: {
+    stand: "Ich stehe neben Woyzeck und verstehe oft nur den Alltag, nicht den Abgrund.",
+    want: "Ich will weiterkommen, schlafen, dienen, überstehen.",
+    fear: "Ich fürchte, dass Woyzecks Unruhe ansteckend wird und ich sie nicht fassen kann.",
+    murder: "Ich bin kein Täter, aber mein Nicht-Verstehen zeigt, wie allein Woyzeck bleibt."
+  },
+  Margreth: {
+    stand: "Ich sehe, was auf der Straße sichtbar wird, und spreche aus, was die Nachbarschaft denkt.",
+    want: "Ich will Abstand halten und doch alles kommentieren.",
+    fear: "Ich fürchte Schande, aber auch, selbst zur Zielscheibe zu werden.",
+    murder: "Die Gewalt fällt nicht aus dem Himmel. Vorher gibt es Blicke, Gerede und soziale Kontrolle."
+  },
+  Narr: {
+    stand: "Ich sage schief, was die Vernünftigen nicht hören wollen.",
+    want: "Ich will spielen, stören, aussprechen, was in der Luft liegt.",
+    fear: "Ich fürchte nichts geradeheraus; meine Wahrheit kommt krumm.",
+    murder: "Die Gewalt ist für mich ein bitteres Spiel der Erwachsenen. Das Kind bleibt übrig."
+  },
+  Jude: {
+    stand: "Ich bin im Moment des Kaufs wichtig: Dinge wechseln den Besitzer, und ein Messer bekommt Richtung.",
+    want: "Ich will handeln, verkaufen, überleben.",
+    fear: "Ich fürchte, in der Welt der anderen nur als Funktion und Vorurteil aufzutauchen.",
+    murder: "Ich mache die Tat nicht, aber der Kauf macht den Entschluss materiell."
+  },
+  Wirt: {
+    stand: "In meinem Raum wird Öffentlichkeit hergestellt: Tanz, Lärm, Alkohol, Blick und Verdacht.",
+    want: "Ich will Betrieb und Ordnung genug, damit der Betrieb weitergeht.",
+    fear: "Ich fürchte, dass aus Unterhaltung plötzlich Blut und Verantwortung werden.",
+    murder: "Das Wirtshaus erklärt den Mord nicht allein, aber es macht Kränkung und Blutspur öffentlich."
+  }
+};
 
 function uniqueSorted(values) {
   return [...new Set(values)].sort((a, b) => a.localeCompare(b, "de"));
@@ -354,6 +453,19 @@ function populateCombiner() {
     select.addEventListener("change", enforceUniquePins);
     slot.append(Object.assign(document.createElement("b"), { textContent: index + 1 }), select);
     pinGrid.append(slot);
+  });
+}
+
+function populateStepGame() {
+  scenes.forEach((scene) => {
+    stepStartSelect.append(sceneOption(scene));
+  });
+  updateNextStepOptions();
+}
+
+function populateInterviews() {
+  interviewCharacters.forEach((character) => {
+    characterSelect.append(new Option(character, character));
   });
 }
 
@@ -454,8 +566,82 @@ function clearPins() {
   });
 }
 
+function availableSceneIds() {
+  const used = new Set(build);
+  return scenes.map((scene) => scene.id).filter((id) => !used.has(id));
+}
+
+function updateNextStepOptions() {
+  const available = availableSceneIds();
+  nextStepSelect.innerHTML = "";
+  if (!available.length) {
+    nextStepSelect.append(new Option("Alle Szenen sind gesetzt", ""));
+    nextStepSelect.disabled = true;
+    return;
+  }
+  available.map(sceneById).forEach((scene) => nextStepSelect.append(sceneOption(scene)));
+  nextStepSelect.disabled = false;
+}
+
+function startStepGame() {
+  const startId = Number(stepStartSelect.value);
+  build = [startId];
+  saveBuild();
+  renderBuild();
+}
+
+function chooseStep(sceneId = Number(nextStepSelect.value)) {
+  if (!sceneId || build.includes(sceneId)) return;
+  if (stepDirectionSelect.value === "backward") {
+    build.unshift(sceneId);
+  } else {
+    build.push(sceneId);
+  }
+  saveBuild();
+  renderBuild();
+}
+
+function chooseRandomStep() {
+  const available = availableSceneIds();
+  if (!available.length) return;
+  chooseStep(available[Math.floor(Math.random() * available.length)]);
+}
+
+function renderStepState() {
+  const direction = stepDirectionSelect.value;
+  stepStartLabel.textContent = direction === "backward" ? "Schlussszene" : "Anfangsszene";
+  nextStepLabel.textContent = direction === "backward" ? "Vorherige Szene" : "Darauffolgende Szene";
+  stepProgress.textContent = `${build.length} / ${scenes.length}`;
+  updateNextStepOptions();
+
+  const sequence = build.map(sceneById).filter(Boolean);
+  if (!sequence.length) {
+    stepStoryOutput.textContent = "Starte ein Schrittspiel, dann erscheint hier nach jeder Wahl der aktuelle Stand der Dramenhandlung.";
+    return;
+  }
+  const first = sequence[0];
+  const last = sequence[sequence.length - 1];
+  const directionText = direction === "backward"
+    ? "Du rekonstruierst vom Ende her. Die aktuell bekannte Vorgeschichte führt"
+    : "Du erzählst vorwärts. Die aktuell entwickelte Handlung führt";
+  const openCount = scenes.length - sequence.length;
+  const chain = sequence.map((scene) => scene.phase).join(" → ");
+  stepStoryOutput.textContent = `${directionText} von ${formatSceneRef(first)} bis ${formatSceneRef(last)}. Bisherige Bewegungslogik: ${chain}. Noch offen: ${openCount} Szene(n). ${buildMurderExplanation(sequence, sequence.findIndex((scene) => scene.id === 20) + 1 || null)}`;
+}
+
 function generateCombination() {
   const mode = modeSelect.value;
+  if (mode === "step-forward" || mode === "step-backward") {
+    stepDirectionSelect.value = mode === "step-backward" ? "backward" : "forward";
+    stepStartSelect.value = mode === "step-backward" && lastSceneSelect.value !== "random"
+      ? lastSceneSelect.value
+      : firstSceneSelect.value !== "random"
+        ? firstSceneSelect.value
+        : stepStartSelect.value;
+    startStepGame();
+    return;
+  }
+
   const result = Array(scenes.length).fill(null);
   const used = new Set();
   const explicitPins = mode === "pinned" || mode === "puzzle" ? selectedPinMap() : new Map();
@@ -534,6 +720,7 @@ function renderBuild() {
   });
   buildCount.textContent = `${build.length} ${build.length === 1 ? "Szene" : "Szenen"}`;
   renderReading();
+  renderStepState();
 }
 
 function sceneById(id) {
@@ -642,6 +829,38 @@ function buildMurderExplanation(sequence, murderPos) {
   return structure;
 }
 
+function characterSceneMatch(scene, character) {
+  const aliases = characterAliases[character] || [character];
+  return aliases.some((alias) => {
+    return scene.figures.includes(alias) || scene.title.includes(alias) || scene.place.includes(alias);
+  });
+}
+
+function buildInterview() {
+  const character = characterSelect.value;
+  const question = questionSelect.value;
+  const sequence = build.map(sceneById).filter(Boolean);
+  const voice = characterVoices[character][question];
+  if (!sequence.length) {
+    interviewOutput.textContent = `${character}: Ich kann noch nichts aus dieser Fassung wissen. Es ist noch keine Szene gesetzt.`;
+    return;
+  }
+
+  const witnessed = sequence.filter((scene) => characterSceneMatch(scene, character));
+  const lastWitnessed = witnessed[witnessed.length - 1];
+  const murderPos = sequence.findIndex((scene) => scene.id === 20) + 1 || null;
+  const murderKnown = murderPos !== null;
+  const motifs = motifLine(sequence);
+  const knowledge = lastWitnessed
+    ? `Mein letzter direkter Stand ist ${formatSceneRef(lastWitnessed)}: ${lastWitnessed.summary}`
+    : "Ich bin in dieser Fassung bisher nicht direkt aufgetreten; ich spreche also aus Randwissen, Gerücht und meiner sozialen Rolle.";
+  const limit = murderKnown
+    ? `Der Mord ist in dieser Montage bereits an Position ${murderPos} gesetzt; alles, was ich sage, steht unter diesem Wissen.`
+    : "Der Mord ist in dieser Montage noch nicht gesetzt; ich kann ihn nur als Möglichkeit, Drohung oder blinden Fleck berühren.";
+
+  interviewOutput.innerHTML = `<strong>${character}:</strong> ${voice} ${knowledge} ${limit} Die bisherige Handlung wird von ${motifs} bestimmt.`;
+}
+
 function exportBuild() {
   renderReading();
   const lines = [
@@ -660,7 +879,13 @@ function exportBuild() {
     "Automatische Auswertung:",
     `Handlung: ${plotOutput.textContent}`,
     `Woyzeck und Marie: ${interpretationOutput.textContent}`,
-    `Morderklärung: ${murderOutput.textContent}`
+    `Morderklärung: ${murderOutput.textContent}`,
+    "",
+    "Schrittmodus-Zwischenhalt:",
+    stepStoryOutput.textContent,
+    "",
+    "Letztes Figurengespräch:",
+    interviewOutput.textContent
   ];
   const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" });
   const url = URL.createObjectURL(blob);
@@ -712,6 +937,11 @@ document.querySelector("#resetBtn").addEventListener("click", () => {
   modeSelect.value = "random";
   firstSceneSelect.value = "random";
   lastSceneSelect.value = "random";
+  stepDirectionSelect.value = "forward";
+  stepStartSelect.value = "1";
+  characterSelect.value = "Franz Woyzeck";
+  questionSelect.value = "stand";
+  interviewOutput.textContent = "Wähle eine Figur und starte ein Gespräch.";
   clearPins();
   build = [];
   notesInput.value = "";
@@ -726,6 +956,10 @@ document.querySelector("#printBtn").addEventListener("click", () => window.print
 document.querySelector("#generateBtn").addEventListener("click", generateCombination);
 document.querySelector("#refreshReadingBtn").addEventListener("click", renderReading);
 document.querySelector("#clearPinsBtn").addEventListener("click", clearPins);
+document.querySelector("#startStepBtn").addEventListener("click", startStepGame);
+document.querySelector("#chooseStepBtn").addEventListener("click", () => chooseStep());
+document.querySelector("#randomStepBtn").addEventListener("click", chooseRandomStep);
+document.querySelector("#interviewBtn").addEventListener("click", buildInterview);
 document.querySelector("#canonicalPinsBtn").addEventListener("click", () => {
   clearPins();
   scenes.forEach((scene, index) => setPin(index, scene.id));
@@ -733,9 +967,18 @@ document.querySelector("#canonicalPinsBtn").addEventListener("click", () => {
 
 modeSelect.addEventListener("change", () => {
   pinDetails.open = modeSelect.value === "pinned" || modeSelect.value === "puzzle";
+  if (modeSelect.value === "step-forward") stepDirectionSelect.value = "forward";
+  if (modeSelect.value === "step-backward") stepDirectionSelect.value = "backward";
+  renderStepState();
 });
+
+stepDirectionSelect.addEventListener("change", renderStepState);
+characterSelect.addEventListener("change", buildInterview);
+questionSelect.addEventListener("change", buildInterview);
 
 populateFilters();
 populateCombiner();
+populateStepGame();
+populateInterviews();
 renderCards();
 renderBuild();
